@@ -1,0 +1,43 @@
+package com.ecommerce.inventory_service.service;
+
+
+import com.ecommerce.inventory_service.dto.InventoryResponse;
+import com.ecommerce.inventory_service.event.OrderPlacedEvent;
+import com.ecommerce.inventory_service.model.Inventory;
+import com.ecommerce.inventory_service.repository.InventoryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class InventoryService {
+    private final InventoryRepository inventoryRepository;
+
+    public List<InventoryResponse> getInventoryBySkuCodes(List<String> skuCodes) {
+        List<Inventory> inventories = inventoryRepository.findBySkuCodeIn(skuCodes);
+
+        return inventories.stream()
+                .map(inventory -> new InventoryResponse(
+                        inventory.getSkuCode(),
+                        inventory.getQuantity() > 0,
+                        inventory.getQuantity()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @KafkaListener(topics = "orderPlacedTopic", groupId = "inventory1")
+    public void sendSomething(OrderPlacedEvent orderPlacedEvent) {
+        log.info("Received order event: {}", orderPlacedEvent);
+
+
+        log.info("Inventory updated for event: {}", orderPlacedEvent.getOrderNumber());
+    }
+}

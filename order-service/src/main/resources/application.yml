@@ -1,0 +1,74 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/order
+    username: furkan
+    password: furkan
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    producer:
+      properties:
+        spring.json.trusted.packages: com.ecommerce.*
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    template:
+      default-topic: orderPlacedTopic
+
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        exclude: *
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory-service:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        sliding-window-type: count_based
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+
+  timelimiter:
+    instances:
+      inventory-service:
+        timeout-duration: 3s
+
+  retry:
+    instances:
+      inventory-service:
+        max-attempts: 3
+        wait-duration: 5s
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: ${EUREKA_HOST:localhost}
+

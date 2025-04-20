@@ -1,0 +1,73 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      global:
+        corsConfigurations:
+          '[/api/v1/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+              - HEAD
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        -   id: order-service
+            uri: lb://order-service
+            predicates:
+              - Path=/api/v1/order/**
+
+        -   id: product-service
+            uri: lb://product-service
+            predicates:
+              - Path=/api/v1/product/**
+
+        -   id: discovery-service
+            uri: http://localhost:8761
+            predicates:
+              - Path=/eureka/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: ${EUREKA_HOST:localhost}
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        sliding-window-type: count_based
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 5s
