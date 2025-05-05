@@ -44,6 +44,7 @@ resilience4j:
         sliding-window-type: count_based
         sliding-window-size: 5
         failure-rate-threshold: 50
+        minimum-number-of-calls: 5
         wait-duration-in-open-state: 5s
         permitted-number-of-calls-in-half-open-state: 3
         automatic-transition-from-open-to-half-open-enabled: true
@@ -57,7 +58,7 @@ resilience4j:
     instances:
       inventory-service:
         max-attempts: 3
-        wait-duration: 5s
+        wait-duration: 4s
 
 eureka:
   client:
