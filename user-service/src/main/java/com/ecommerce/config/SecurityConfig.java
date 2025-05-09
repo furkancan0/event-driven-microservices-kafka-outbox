@@ -1,6 +1,5 @@
 package com.ecommerce.config;
 
-import com.ecommerce.helper.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthFilter jwtAuthFilter;
 
 
     @Bean
@@ -31,15 +29,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers("api/v1/auth/**")
                                 .permitAll()
-                                .requestMatchers("/api/v1/products/**").permitAll()
-                                .requestMatchers("/api/v1/carts/**").permitAll()
-                                .requestMatchers("/api/v1/orders/**").hasRole("USER")
-                                .requestMatchers("/api/checkout/**").hasRole("USER")
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
