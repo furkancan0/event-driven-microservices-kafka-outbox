@@ -9,12 +9,16 @@ import com.ecommerce.model.RoleEnum;
 import com.ecommerce.model.User;
 import com.ecommerce.repository.RoleRepository;
 import com.ecommerce.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 
@@ -37,30 +41,27 @@ public class AuthService {
                 .role(role)
                 .build();
         userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.createToken(registerRequest.getEmail(), String.valueOf(role.getName()));
         return AuthenticationResponse.builder().accessToken(jwtToken).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        //validate whether password & username is correct
-        //Verify whether user present in the database
-        //Which AuthenticationProvider -> DaoAuthenticationProvider (Inject)
-        //Authenticate using authenticationManager injecting this authenticationProvider
-        //Verify whether userName and password is correct => UserNamePasswordAuthenticationToken
-        //Verify whether user present in db
-        //generateToken
-        //Return the token
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
-        String jwtToken = jwtService.generateToken(user);
+        var user = getUserPrincipalByEmail(request.getEmail());
+        String jwtToken = jwtService.createToken(user.getEmail(), String.valueOf(user.getRole().getName()));
         return AuthenticationResponse.builder().accessToken(jwtToken).build();
 
+    }
+
+    public Long getCurrentUserId() {
+        RequestAttributes attribs = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) attribs).getRequest();
+        return Long.parseLong(request.getHeader("auth-user-id"));
     }
 
     public User getUserPrincipalByEmail(String email) {

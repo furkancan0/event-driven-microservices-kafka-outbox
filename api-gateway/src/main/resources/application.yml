@@ -27,28 +27,28 @@ spring:
         -   id: auth-service
             uri: lb://user-service
             predicates:
-              - Path=/api/v1/auth/**
+              - Path=/api/v1/auth/register, /api/v1/auth/login, /api/v1/auth/validate-token, /api/v1/auth/refresh-token
 
         -   id: order-service
             uri: lb://order-service
             predicates:
               - Path=/api/v1/order/**
             filters:
-              - name: AuthFilter
+              - name: JwtAuthFilter
 
         -   id: product-service
             uri: lb://product-service
             predicates:
               - Path=/api/v1/product/**
             filters:
-              - name: AuthFilter
+              - name: JwtAuthFilter
 
         -   id: user-service
             uri: lb://user-service
             predicates:
               - Path=/api/v1/user/**
             filters:
-              - name: AuthFilter
+              - name: JwtAuthFilter
 
 eureka:
   client:
@@ -59,18 +59,23 @@ eureka:
   instance:
     hostname: ${EUREKA_HOST:localhost}
 
+
 resilience4j:
   circuitbreaker:
-    configs:
-      default:
-        register-health-indicator: true
-        event-consumer-buffer-size: 10
-        sliding-window-type: count_based
-        sliding-window-size: 5
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 5s
-        permitted-number-of-calls-in-half-open-state: 3
-        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      authCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 10
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        record-exceptions:
+          - java.util.concurrent.TimeoutException
+          - org.springframework.cloud.gateway.support.NotFoundException
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
 
   timelimiter:
     configs:
@@ -82,3 +87,8 @@ resilience4j:
       default:
         max-attempts: 3
         wait-duration: 5s
+
+jwt:
+  header: Authorization
+  secret: ANMGN10M0EI76QJPOOCAKRD1RJ98C6AACBIM8YYCJKMH43VTD52IRJE8N0DEOB70
+  expiration: 6048000

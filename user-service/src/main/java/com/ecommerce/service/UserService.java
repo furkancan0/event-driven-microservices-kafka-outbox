@@ -25,6 +25,6 @@ public class UserService {
     private Long getUserId() {
         RequestAttributes attribs = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) attribs).getRequest();
-        return Long.parseLong(request.getHeader("auth-user-id"));
+        return Long.parseLong(request.getHeader("X-USER-ID"));
     }
 }

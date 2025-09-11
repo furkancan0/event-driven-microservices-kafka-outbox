@@ -13,7 +13,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,28 +32,19 @@ public class OrderService{
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
         order.setStatus(Status.PENDING);
-        order.setOrderLineItems(createOrderLineItem(orderRequest.getOrderLineItems(), order));
-        List<String> skuCodes = getSkuCodes(orderRequest.getOrderLineItems());
-
-        if (inventoryServiceClient.getProductsBySkuCodes(skuCodes)) {
-            System.out.println("bırdahnnn");
-            orderRepository.save(order);
-            OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(order.getOrderNumber());
-            kafkaTemplate.send("orderPlacedTopic", orderPlacedEvent);
-            return "Order saved successfully";
-        } else {
-            throw new IllegalArgumentException("Product is not in stock, please try again later");
-        }
+        order.setOrderLineItems(new HashSet<>(createOrderLineItem(orderRequest.getOrderLineItems(), order)));
+        orderRepository.save(order);
+        return "Order saved successfully " + order.getOrderNumber();
     }
 
     private static List<OrderLineItem> createOrderLineItem(List<OrderLineItemRequest> orderLineItemRequests, Order order) {
         return orderLineItemRequests.stream()
                 .map(orderLineItemRequest -> {
                     OrderLineItem orderLineItem = new OrderLineItem();
+                    orderLineItem.setOrder(order);
                     orderLineItem.setSkuCode(orderLineItemRequest.getSkuCode());
                     orderLineItem.setPrice(orderLineItemRequest.getPrice());
                     orderLineItem.setQuantity(orderLineItemRequest.getQuantity());
-                    orderLineItem.setOrder(order);
                     return orderLineItem;
                 })
                 .collect(Collectors.toList());
