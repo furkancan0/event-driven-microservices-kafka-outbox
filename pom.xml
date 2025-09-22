@@ -37,10 +37,11 @@
     </properties>
     <packaging>pom</packaging>
     <modules>
-        <module>product-service</module>
-        <module>inventory-service</module>
+        <module>catalog-service</module>
         <module>order-service</module>
         <module>user-service</module>
+        <module>payment-service</module>
+        <module>notification-service</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
     </modules>
