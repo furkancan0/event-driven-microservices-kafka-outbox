@@ -1,7 +1,5 @@
 package com.ecommerce.entity;
 
-import com.common.event.OrderStatus;
-import com.common.event.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
