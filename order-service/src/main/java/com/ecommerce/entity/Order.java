@@ -20,9 +20,4 @@ public class Order {
     private Integer productId;
     private Integer price;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
 }

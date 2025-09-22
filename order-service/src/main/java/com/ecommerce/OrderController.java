@@ -1,6 +1,5 @@
 package com.ecommerce;
 
-import com.common.dto.OrderRequestDto;
 import com.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,4 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("create")
-    public String placeOrder(@RequestBody OrderRequestDto orderRequestDto) {
-        return orderService.placeOrder(orderRequestDto);
-    }
 }
