@@ -12,8 +12,31 @@ jobs:
   build:
     strategy:
       matrix:
-        image_name: ["order-service", "catalog-service", "user-service", "payment-service", "notification-service"]
+        include:
+          - image_name: order-service
+            db_name: order_db
+          - image_name: catalog-service
+            db_name: catalog_db
+          - image_name: user-service
+            db_name: user_db
+          - image_name: payment-service
+          - image_name: notification-service
+            db_name: notification_db
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: furkan
+          POSTGRES_PASSWORD: furkan
+          POSTGRES_DB: ${{ matrix.db_name }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
