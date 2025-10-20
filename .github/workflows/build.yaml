@@ -27,7 +27,7 @@ jobs:
 
       - name: Build with Maven
         working-directory: ${{ matrix.image_name }}
-        run: ./mvnw -ntp verify
+        run: ./mvnw -B clean verify --no-transfer-progress
 
       - name: Log in to Github Container Registry
         uses: docker/login-action@v2
