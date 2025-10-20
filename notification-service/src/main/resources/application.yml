@@ -1,0 +1,35 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/notification_db
+    username: furkan
+    password: furkan
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    baseline-on-migrate: true
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: order-notification
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.ecommerce.*
+            type:
+              mapping: OrderEvent:com.ecommerce.models.OrderEvent
+

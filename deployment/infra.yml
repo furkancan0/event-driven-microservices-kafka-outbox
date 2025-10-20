@@ -5,7 +5,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: microservice_db
+      POSTGRES_DB: postgres
       POSTGRES_USER: furkan
       POSTGRES_PASSWORD: furkan
     ports:
@@ -51,18 +51,6 @@ services:
       KAFKA_CLUSTERS_BOOTSTRAPSERVERS: kafka-broker:29092
       DYNAMIC_CONFIG_ENABLED: 'true'
 
-  kafka-schema-registry:
-    image: confluentinc/cp-schema-registry:7.5.0
-    hostname: kafka-schema-registry
-    container_name: kafka-schema-registry
-    depends_on:
-      - kafka-broker
-    ports:
-      - "8083:8081"
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-broker:29092'
-      SCHEMA_REGISTRY_LISTENERS: http://kafka-schema-registry:8081
   redis:
     image: redis:7-alpine
     ports:

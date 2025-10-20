@@ -58,11 +58,6 @@ public class AuthService {
 
     }
 
-    public Long getCurrentUserId() {
-        RequestAttributes attribs = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) attribs).getRequest();
-        return Long.parseLong(request.getHeader("auth-user-id"));
-    }
 
     public User getUserPrincipalByEmail(String email) {
         return userRepository.findByEmail(email)

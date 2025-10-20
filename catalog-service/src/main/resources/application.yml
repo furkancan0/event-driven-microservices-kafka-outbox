@@ -5,7 +5,7 @@ spring:
   application:
     name: catalog-service
   datasource:
-    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/postgres
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/catalog_db
     username: furkan
     password: furkan
     driverClassName: org.postgresql.Driver
@@ -16,31 +16,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  kafka:
-    producer:
-      properties:
-        spring.json.trusted.packages: com.ecommerce.*
-      bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    template:
-      default-topic: orderPlacedTopic
-
-
-management:
-  health:
-    circuitbreakers:
-      enabled: true
-  endpoint:
-    health:
-      show-details: always
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    hostname: ${EUREKA_HOST:localhost}
+  flyway:
+    baseline-on-migrate: true
 

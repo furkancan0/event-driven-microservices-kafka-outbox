@@ -1,11 +1,11 @@
 server:
-  port: 8070
+  port: 8060
 
 spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/order
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/order_db
     username: furkan
     password: furkan
     driverClassName: org.postgresql.Driver
@@ -16,6 +16,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    baseline-on-migrate: true
   kafka:
     producer:
       properties:
@@ -24,7 +26,27 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     template:
-      default-topic: orderPlacedTopic
+      default-topic: order-created
+
+resilience4j:
+  circuitbreaker:
+    backends:
+      payment-service:
+        sliding-window-type: count_based
+        slidingWindowSize: 6
+        registerHealthIndicator: true
+        minimumNumberOfCalls: 4
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 20s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+
+  retry:
+    backends:
+      payment-service:
+        max-attempts: 2
+        wait-duration: 1s
 
 
 management:
@@ -34,31 +56,6 @@ management:
   endpoint:
     health:
       show-details: always
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      inventory-service:
-        register-health-indicator: true
-        event-consumer-buffer-size: 10
-        sliding-window-type: count_based
-        sliding-window-size: 5
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 5
-        wait-duration-in-open-state: 5s
-        permitted-number-of-calls-in-half-open-state: 3
-        automatic-transition-from-open-to-half-open-enabled: true
-
-  timelimiter:
-    instances:
-      inventory-service:
-        timeout-duration: 3s
-
-  retry:
-    instances:
-      inventory-service:
-        max-attempts: 3
-        wait-duration: 4s
 
 eureka:
   client:
