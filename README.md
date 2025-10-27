@@ -36,7 +36,6 @@ Kafka is primarily used for propagating domain events such as:
 * These patterns are mainly used in the Order → Payment interaction to maintain a smooth checkout experience even under partial system outages.
 
 🧱 Architecture Overview  
-Core Components:  
 * API Gateway: Entry point for all external requests (routing, authentication, rate limiting)  
 * Discovery Server (Eureka): Service registry and dynamic discovery for microservices.  
 * Auth Service: Handles user registration, login, and JWT-based authentication.  
