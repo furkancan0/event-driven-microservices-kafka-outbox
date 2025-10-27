@@ -46,7 +46,7 @@ Kafka is primarily used for propagating domain events such as:
 
 | Communication Type    | Mechanism                 | Usage                                         |  
 | --------------------- | ------------------------- | --------------------------------------------- |  
-| **Synchronous**       | RestClient / RestTemplate | Order → Payment (with CircuitBreaker & Retry) |  
+| **Synchronous**       | RestClient                | Order → Payment (with CircuitBreaker & Retry) |  
 | **Asynchronous**      | Kafka Events              | Order → Inventory, Order → Notification       |  
 | **Service Discovery** | Eureka                    | Dynamic routing & load balancing              |  
 | **Gateway Routing**   | Spring Cloud Gateway      | Unified API entry point                       |  
