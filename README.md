@@ -20,9 +20,6 @@ Kafka is primarily used for propagating domain events such as:
 * Inventory updates after checkout  
 * Notifications or analytics after order processing  
 
-💳 Order & Payment Flow (Resilience Priority)  
-Unlike the typical asynchronous event chain, this system handles Payment in a synchronous manner for reliability and immediacy during checkout.  
-
 ✅ Flow Summary  
 
 1. The Order Service receives a checkout request.  
