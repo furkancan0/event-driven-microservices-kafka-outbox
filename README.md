@@ -51,6 +51,8 @@ Kafka is primarily used for propagating domain events such as:
 | **Service Discovery** | Eureka                    | Dynamic routing & load balancing              |  
 | **Gateway Routing**   | Spring Cloud Gateway      | Unified API entry point                       |  
 
+to get userId from header use "X-USER-ID"
+
 
 
 
